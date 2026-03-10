@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENSANDBOX_URL=http://opensandbox:8000
+    depends_on:
+      - opensandbox
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+
+  opensandbox:
+    image: opensandbox/opensandbox:latest
+    ports:
+      - "9000:8000"

@@ -10,7 +10,9 @@
       "Bash(gh repo:*)",
       "Bash(which gh:*)",
       "Bash(cd /Users/newmac/Projects/agentconsole/frontend && npm run dev)",
-      "Bash(cd /Users/newmac/Projects/agentconsole/backend && uvicorn app.main:app --reload --port 8000)"
+      "Bash(cd /Users/newmac/Projects/agentconsole/backend && uvicorn app.main:app --reload --port 8000)",
+      "Bash(curl -s http://localhost:8000/health 2>/dev/null || echo \"Backend not running\")",
+      "Bash(curl -s http://localhost:8000/health)"
     ]
   }
 }

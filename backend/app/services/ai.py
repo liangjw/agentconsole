@@ -6,7 +6,7 @@ import httpx
 class AIService:
     def __init__(self):
         self.api_key = os.getenv("ANTHROPIC_API_KEY", "")
-        self.base_url = "https://api.anthropic.com/v1"
+        self.base_url = os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com/v1")
         self.model = os.getenv("AI_MODEL", "claude-sonnet-4-20250514")
 
     async def chat(

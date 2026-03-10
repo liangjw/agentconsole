@@ -10,6 +10,7 @@ router = APIRouter()
 
 # 预定义的Skills定义
 PREDEFINED_SKILLS = [
+    # 文件操作
     {
         "id": "file_read",
         "name": "文件读取",
@@ -48,6 +49,25 @@ PREDEFINED_SKILLS = [
         "icon": "✍️"
     },
     {
+        "id": "file_list",
+        "name": "文件列表",
+        "description": "列出目录中的文件",
+        "type": "tool",
+        "definition": {
+            "name": "list_files",
+            "description": "列出目录中的文件",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "path": {"type": "string", "description": "目录路径", "default": "/workspace"}
+                },
+                "required": []
+            }
+        },
+        "icon": "📁"
+    },
+    # 命令执行
+    {
         "id": "command_exec",
         "name": "命令执行",
         "description": "在沙箱中执行shell命令",
@@ -65,6 +85,7 @@ PREDEFINED_SKILLS = [
         },
         "icon": "⚡"
     },
+    # 网络
     {
         "id": "web_fetch",
         "name": "网页抓取",
@@ -79,6 +100,148 @@ PREDEFINED_SKILLS = [
                     "url": {"type": "string", "description": "网址"}
                 },
                 "required": ["url"]
+            }
+        },
+        "icon": "🌐"
+    },
+    {
+        "id": "download_file",
+        "name": "文件下载",
+        "description": "从URL下载文件到沙箱",
+        "type": "tool",
+        "definition": {
+            "name": "download_file",
+            "description": "从URL下载文件",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "description": "文件URL"},
+                    "path": {"type": "string", "description": "保存路径"}
+                },
+                "required": ["url", "path"]
+            }
+        },
+        "icon": "📥"
+    },
+    # 代码执行
+    {
+        "id": "code_execute",
+        "name": "代码执行",
+        "description": "执行Python/Node.js代码",
+        "type": "tool",
+        "definition": {
+            "name": "execute_code",
+            "description": "执行代码",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "language": {"type": "string", "description": "语言 python/nodejs", "enum": ["python", "nodejs"]},
+                    "code": {"type": "string", "description": "代码内容"}
+                },
+                "required": ["language", "code"]
+            }
+        },
+        "icon": "💻"
+    },
+    # Git操作
+    {
+        "id": "git_clone",
+        "name": "Git克隆",
+        "description": "克隆Git仓库到沙箱",
+        "type": "tool",
+        "definition": {
+            "name": "git_clone",
+            "description": "克隆Git仓库",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "description": "Git仓库URL"},
+                    "path": {"type": "string", "description": "克隆到的目录", "default": "/workspace"}
+                },
+                "required": ["url"]
+            }
+        },
+        "icon": "📦"
+    },
+    {
+        "id": "git_command",
+        "name": "Git命令",
+        "description": "执行Git命令",
+        "type": "tool",
+        "definition": {
+            "name": "git_command",
+            "description": "执行Git命令",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "command": {"type": "string", "description": "Git命令(不带git前缀)"},
+                    "path": {"type": "string", "description": "仓库路径", "default": "/workspace"}
+                },
+                "required": ["command"]
+            }
+        },
+        "icon": "🔀"
+    },
+    # 数据处理
+    {
+        "id": "json_parse",
+        "name": "JSON解析",
+        "description": "解析和操作JSON数据",
+        "type": "tool",
+        "definition": {
+            "name": "parse_json",
+            "description": "解析JSON数据",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "data": {"type": "string", "description": "JSON字符串"},
+                    "operation": {"type": "string", "description": "操作: parse/format/query", "enum": ["parse", "format", "query"]},
+                    "query": {"type": "string", "description": "JMESPath查询(可选)"}
+                },
+                "required": ["data", "operation"]
+            }
+        },
+        "icon": "🔧"
+    },
+    # 包管理
+    {
+        "id": "pip_install",
+        "name": "Python包安装",
+        "description": "安装Python包",
+        "type": "tool",
+        "definition": {
+            "name": "pip_install",
+            "description": "安装Python包",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "packages": {"type": "string", "description": "包名(空格分隔)"}
+                },
+                "required": ["packages"]
+            }
+        },
+        "icon": "🐍"
+    },
+    {
+        "id": "npm_install",
+        "name": "NPM包安装",
+        "description": "安装Node.js包",
+        "type": "tool",
+        "definition": {
+            "name": "npm_install",
+            "description": "安装Node.js包",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "packages": {"type": "string", "description": "包名(空格分隔)"},
+                    "path": {"type": "string", "description": "项目路径", "default": "/workspace"}
+                },
+                "required": ["packages"]
+            }
+        },
+        "icon": "📦"
+    },
+]
             }
         },
         "icon": "🌐"
@@ -128,6 +291,7 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any], sandbox_id: s
     """执行工具调用"""
     result = ""
 
+    # 文件操作
     if tool_name == "read_file":
         result = await sandbox_service.read_file(sandbox_id, tool_input.get("path", ""))
 
@@ -139,27 +303,109 @@ async def execute_tool(tool_name: str, tool_input: Dict[str, Any], sandbox_id: s
         )
         result = "文件写入成功" if success else "文件写入失败"
 
+    elif tool_name == "list_files":
+        path = tool_input.get("path", "/workspace")
+        files = await sandbox_service.list_files(sandbox_id, path)
+        result = "文件列表:\n" + "\n".join(f"  - {f}" for f in files)
+
+    # 命令执行
     elif tool_name == "execute_command":
         result = await sandbox_service.execute_command(sandbox_id, tool_input.get("command", ""))
 
+    # 网络操作
     elif tool_name == "fetch_web":
-        # 使用curl获取网页
         url = tool_input.get("url", "")
-        cmd_result = await sandbox_service.execute_command(sandbox_id, f"curl -s '{url}' | head -100")
+        cmd_result = await sandbox_service.execute_command(sandbox_id, f"curl -sL '{url}' | head -200")
         result = cmd_result.get("stdout", cmd_result.get("stderr", ""))
 
+    elif tool_name == "download_file":
+        url = tool_input.get("url", "")
+        path = tool_input.get("path", "/workspace")
+        cmd_result = await sandbox_service.execute_command(
+            sandbox_id,
+            f"curl -sL '{url}' -o '{path}' && echo 'Downloaded to {path}'"
+        )
+        result = cmd_result.get("stdout", cmd_result.get("stderr", ""))
+
+    # 代码执行
     elif tool_name == "execute_code":
         language = tool_input.get("language", "python")
         code = tool_input.get("code", "")
 
         if language == "python":
-            cmd = f'python3 -c """{code}"""'
+            # 写入临时文件执行以便处理复杂代码
+            await sandbox_service.write_file(sandbox_id, "/tmp/script.py", code)
+            cmd_result = await sandbox_service.execute_command(sandbox_id, "python3 /tmp/script.py")
         elif language == "nodejs":
-            cmd = f'node -e "{code}"'
+            await sandbox_service.write_file(sandbox_id, "/tmp/script.js", code)
+            cmd_result = await sandbox_service.execute_command(sandbox_id, "node /tmp/script.js")
         else:
             return f"不支持的语言: {language}"
 
-        result = await sandbox_service.execute_command(sandbox_id, cmd)
+        result = f"stdout:\n{cmd_result.get('stdout', '')}\nstderr:\n{cmd_result.get('stderr', '')}\nexit_code: {cmd_result.get('exit_code', 0)}"
+
+    # Git操作
+    elif tool_name == "git_clone":
+        url = tool_input.get("url", "")
+        path = tool_input.get("path", "/workspace")
+        cmd_result = await sandbox_service.execute_command(
+            sandbox_id,
+            f"git clone '{url}' '{path}'"
+        )
+        result = cmd_result.get("stdout", cmd_result.get("stderr", ""))
+
+    elif tool_name == "git_command":
+        command = tool_input.get("command", "")
+        path = tool_input.get("path", "/workspace")
+        cmd_result = await sandbox_service.execute_command(
+            sandbox_id,
+            f"cd '{path}' && git {command}"
+        )
+        result = f"stdout:\n{cmd_result.get('stdout', '')}\nstderr:\n{cmd_result.get('stderr', '')}\nexit_code: {cmd_result.get('exit_code', 0)}"
+
+    # 数据处理
+    elif tool_name == "parse_json":
+        import json
+        data_str = tool_input.get("data", "{}")
+        operation = tool_input.get("operation", "parse")
+
+        try:
+            data = json.loads(data_str)
+            if operation == "format":
+                result = json.dumps(data, indent=2, ensure_ascii=False)
+            elif operation == "query":
+                # 简单查询 - 支持key路径如 "data.users.0.name"
+                query = tool_input.get("query", "")
+                parts = query.split(".")
+                current = data
+                for part in parts:
+                    if part.isdigit():
+                        current = current[int(part)]
+                    else:
+                        current = current.get(part, {})
+                result = json.dumps(current, indent=2, ensure_ascii=False) if current else "Not found"
+            else:
+                result = json.dumps(data, indent=2, ensure_ascii=False)
+        except json.JSONDecodeError as e:
+            result = f"JSON解析错误: {e}"
+
+    # 包管理
+    elif tool_name == "pip_install":
+        packages = tool_input.get("packages", "")
+        cmd_result = await sandbox_service.execute_command(
+            sandbox_id,
+            f"pip install {packages}"
+        )
+        result = f"stdout:\n{cmd_result.get('stdout', '')}\nstderr:\n{cmd_result.get('stderr', '')}\nexit_code: {cmd_result.get('exit_code', 0)}"
+
+    elif tool_name == "npm_install":
+        packages = tool_input.get("packages", "")
+        path = tool_input.get("path", "/workspace")
+        cmd_result = await sandbox_service.execute_command(
+            sandbox_id,
+            f"cd '{path}' && npm install {packages}"
+        )
+        result = f"stdout:\n{cmd_result.get('stdout', '')}\nstderr:\n{cmd_result.get('stderr', '')}\nexit_code: {cmd_result.get('exit_code', 0)}"
 
     else:
         result = f"未知工具: {tool_name}"

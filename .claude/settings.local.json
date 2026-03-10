@@ -8,7 +8,9 @@
       "Bash(git remote:*)",
       "Bash(git push:*)",
       "Bash(gh repo:*)",
-      "Bash(which gh:*)"
+      "Bash(which gh:*)",
+      "Bash(cd /Users/newmac/Projects/agentconsole/frontend && npm run dev)",
+      "Bash(cd /Users/newmac/Projects/agentconsole/backend && uvicorn app.main:app --reload --port 8000)"
     ]
   }
 }

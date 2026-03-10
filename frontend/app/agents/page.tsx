@@ -46,18 +46,32 @@ export default function AgentsPage() {
     <div className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1>智能代理管理</h1>
-        <Link href="/agents/new">
-          <button style={{
-            padding: '10px 20px',
-            background: '#4f46e5',
-            color: 'white',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer'
-          }}>
-            + 创建代理
-          </button>
-        </Link>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Link href="/templates">
+            <button style={{
+              padding: '10px 20px',
+              background: '#7c3aed',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer'
+            }}>
+              模板市场
+            </button>
+          </Link>
+          <Link href="/agents/new">
+            <button style={{
+              padding: '10px 20px',
+              background: '#4f46e5',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer'
+            }}>
+              + 创建代理
+            </button>
+          </Link>
+        </div>
       </div>
 
       <div style={{ marginTop: 20 }}>

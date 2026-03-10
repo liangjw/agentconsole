@@ -549,6 +549,51 @@ async def send_message(
 
     return db_response
 
+@router.get("/{conversation_id}/files")
+async def get_sandbox_files(conversation_id: str, db: Session = Depends(get_db)):
+    """获取沙箱中的文件列表"""
+    conversation = db.query(models.Conversation).filter(
+        models.Conversation.id == conversation_id
+    ).first()
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not conversation.sandbox_id:
+        return {"files": [], "path": "/workspace"}
+
+    # 获取文件列表
+    files = await sandbox_service.list_files(conversation.sandbox_id, "/workspace")
+
+    # 构建目录树结构
+    tree = build_file_tree(files)
+
+    return {
+        "files": tree,
+        "path": "/workspace",
+        "sandbox_id": conversation.sandbox_id
+    }
+
+def build_file_tree(files: List[str]) -> List[Dict]:
+    """构建目录树结构"""
+    tree = []
+    for f in files:
+        parts = f.strip("/").split("/")
+        if len(parts) == 1:
+            # 根目录文件
+            tree.append({
+                "name": parts[0],
+                "type": "file",
+                "path": "/" + parts[0]
+            })
+        else:
+            # 子目录
+            tree.append({
+                "name": parts[0],
+                "type": "directory",
+                "path": "/" + parts[0]
+            })
+    return tree
+
 @router.delete("/{conversation_id}")
 async def delete_conversation(conversation_id: str, db: Session = Depends(get_db)):
     conversation = db.query(models.Conversation).filter(

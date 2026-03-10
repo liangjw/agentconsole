@@ -22,6 +22,13 @@ export const getMessages = (conversationId: string) =>
 export const sendMessage = (conversationId: string, content: string) =>
   api.post(`/api/conversations/${conversationId}/messages`, { content })
 export const endConversation = (id: string) => api.delete(`/api/conversations/${id}`)
+export const getSandboxFiles = (conversationId: string) =>
+  api.get(`/api/conversations/${conversationId}/files`)
 
 // Skills APIs
 export const getSkills = () => api.get('/api/skills')
+
+// Template APIs
+export const getTemplates = () => api.get('/api/templates')
+export const getTemplate = (id: string) => api.get(`/api/templates/${id}`)
+export const getTemplateCategories = () => api.get('/api/templates/categories')

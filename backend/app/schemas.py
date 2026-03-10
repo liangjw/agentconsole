@@ -58,3 +58,12 @@ class Skill(BaseModel):
     type: str
     definition: dict
     icon: str = "🔧"
+
+class AgentTemplate(BaseModel):
+    id: str
+    name: str
+    description: str
+    skills: List[str]
+    image: str
+    icon: str = "🤖"
+    category: str = "通用"
